@@ -8,6 +8,8 @@ class Thread extends Model
 {
 	protected $guarded = [];
 
+	use RecordsActivity;
+
 	protected $with = ['creator', 'channel'];
 
 	protected static function boot()
@@ -17,7 +19,14 @@ class Thread extends Model
 		static::addGlobalScope('replyCount', function ($builder){
 			$builder->withCount('replies');
 		});
-	}
+
+		static::deleting(function ($thread) {
+            $thread->replies->each->delete();
+        });
+
+
+    }
+	
 
     public function path()
     {
